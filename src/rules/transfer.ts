@@ -34,13 +34,8 @@ export function chargeLeg(
     const upgrade = baseFare(tariff, leg.zones) - baseFare(tariff, previous.zones);
     if (upgrade <= 0) return accumulate(tariff, day, 0);
 
-    // KNOWN DEFECT (ticket: "senior discount not applied on transfers after 19:00"):
-    // the evening branch charges the full upgrade, skipping applyReduction, so a
-    // senior transferring to a further zone after the peak boundary pays twice what
-    // they should. The daytime branch below is correct.
-    if (hour >= tariff.peakEndHour) {
-      return accumulate(tariff, day, upgrade);
-    }
+    // The reduced-fare entitlement applies to evening upgrades too, and the result
+    // still goes through the accumulator — which is what the naive fix skipped.
     return accumulate(tariff, day, applyReduction(tariff, upgrade, leg.pass));
   }
 
