@@ -1,0 +1,26 @@
+# The invariant gate. Registered as the required status check "invariants" on main,
+# so a failing verdict blocks the merge at the platform rather than by convention.
+name: gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  invariants:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v7.0.1
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v7.0.0
+        with:
+          node-version: '22'
+      - name: Run the invariant suite
+        run: node --experimental-strip-types run-gate.mjs
