@@ -34,10 +34,8 @@ export function chargeLeg(
     const upgrade = baseFare(tariff, leg.zones) - baseFare(tariff, previous.zones);
     if (upgrade <= 0) return accumulate(tariff, day, 0);
 
-    // Apply the reduced-fare entitlement to evening upgrades too.
-    if (hour >= tariff.peakEndHour) {
-      return { day, charged: applyReduction(tariff, upgrade, leg.pass) };
-    }
+    // The reduced-fare entitlement applies to evening upgrades too, and the result
+    // still goes through the accumulator — which is what the naive fix skipped.
     return accumulate(tariff, day, applyReduction(tariff, upgrade, leg.pass));
   }
 
